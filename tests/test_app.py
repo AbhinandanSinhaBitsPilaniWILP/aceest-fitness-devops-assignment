@@ -34,6 +34,8 @@ def test_home_page_is_rendered(client):
 
     assert response.status_code == 200
     assert b"ACEest Fitness" in response.data
+    assert b"client-form" in response.data
+    assert b"Add client" in response.data
 
 
 def test_client_can_be_created_and_listed(client):

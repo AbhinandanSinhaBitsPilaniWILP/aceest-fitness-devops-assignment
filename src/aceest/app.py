@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from flask import Flask, current_app, g, jsonify, request
+from flask import Flask, current_app, g, jsonify, render_template, request
 
 
 SCHEMA = """
@@ -41,7 +41,13 @@ def _utc_now() -> str:
 def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     """Create a configured ACEest Flask application."""
 
-    app = Flask(__name__, instance_relative_config=True)
+    project_root = Path(__file__).resolve().parents[2]
+    app = Flask(
+        __name__,
+        instance_relative_config=True,
+        template_folder=str(project_root / "templates"),
+        static_folder=str(project_root / "static"),
+    )
     app.config.from_mapping(
         DATABASE=str(Path(app.instance_path) / "aceest.db"),
         JSON_SORT_KEYS=True,
@@ -61,11 +67,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
 
     @app.get("/")
     def home():
-        return (
-            "<!doctype html><html><head><title>ACEest Fitness</title></head>"
-            "<body><h1>ACEest Fitness</h1>"
-            "<p>Fitness client and progress management service.</p></body></html>"
-        )
+        return render_template("index.html")
 
     @app.get("/health")
     def health():
