@@ -56,7 +56,7 @@ health smoke test -> evidence capture -> rollback on failure
 | Assignment requirement | Repository implementation | Evidence status |
 |---|---|---|
 | Flask application | src/aceest, templates, static assets | Verified locally |
-| Git and GitHub | Local Git repository, commit history, README publishing instructions | Local Git verified; GitHub push requires authenticated session |
+| Git and GitHub | Local Git repository, commit history, README publishing instructions | Verified locally and pushed to public GitHub repository |
 | Pytest | tests/, pytest.ini, pytest-cov | Verified locally: 28 tests passed |
 | Jenkins | Jenkinsfile with checkout, install, tests, quality, image, push, deploy, smoke stages | Pipeline source verified; Jenkins run requires configured server |
 | SonarQube | sonar-project.properties, Jenkins quality-gate stage | Configuration verified; live gate requires SonarQube server |
@@ -120,8 +120,8 @@ ab-ingress.yaml defines a candidate B workload and NGINX Ingress header routing 
 
 - Local application: http://127.0.0.1:8000/ - available when started with the README command.
 - Local health check: http://127.0.0.1:8000/health.
-- Candidate GitHub account: https://github.com/AbhinandanSinhaBitsPilaniWILP - account URL supplied by the student; access was not verified in this build session.
-- Candidate repository path: AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment - create or connect this repository after GitHub authentication.
+- GitHub account: https://github.com/AbhinandanSinhaBitsPilaniWILP - verified through GitHub CLI authentication.
+- GitHub repository: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment - public repository with the verified main branch.
 - Docker Hub repository: to be filled after the authenticated Docker Hub username and repository are created.
 - Jenkins build URL: to be filled after the Jenkins job is created.
 - SonarQube project URL: to be filled after the project is created on the configured SonarQube server.
@@ -165,7 +165,7 @@ Current capture result: the local server started successfully, but browser acces
 - [x] Rollback scripts.
 - [x] Supplied source versions preserved.
 - [x] Detailed report and evidence guide.
-- [ ] GitHub repository created and pushed.
+- [x] GitHub repository created and pushed.
 - [ ] Docker Hub repository created and images pushed.
 - [ ] Jenkins successful run screenshot and URL.
 - [ ] SonarQube quality-gate screenshot and URL.
