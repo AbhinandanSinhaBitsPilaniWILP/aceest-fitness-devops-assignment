@@ -1,17 +1,17 @@
-<!doctype html><meta charset='utf-8'><title>ACEest Fitness DevOps Assignment Report</title><style>body{font-family:system-ui;max-width:1000px;margin:2rem auto;padding:0 1rem}pre{white-space:pre-wrap;line-height:1.5}h1{color:#0d5b6e}</style><h1>ACEest Fitness DevOps Assignment Report</h1><pre># ACEest Fitness DevOps Assignment Report
+<!doctype html><meta charset='utf-8'><title>ACEest Fitness DevOps Assignment Report</title><style>body{font-family:system-ui;max-width:1000px;margin:2rem auto;padding:0 1rem}pre{white-space:pre-wrap;line-height:1.5}h1{color:#0d5b6e}</style><h1>ACEest Fitness DevOps Assignment Report</h1><pre># ACEest Fitness – DevOps Assignment 2
 
 Student: Abhinandan Sinha  
 Account: AbhinandanSinhaBitsPilaniWILP  
 Assignment: Introduction to DevOps - CI/CD Pipeline Assignment 2  
-Report state: Local implementation complete; external-service evidence is clearly marked below.
+Status: Code, local checks, GitHub repository, and GitHub Actions run completed. The remaining external tools are listed honestly below.
 
 ## Executive summary
 
-This submission implements an end-to-end DevOps repository for ACEest Fitness and Gym. The deployable application is a Flask service with a browser interface, health endpoint, client management, and fitness-progress recording. It is backed by SQLite and packaged for a non-root Docker runtime on port 8000.
+This project is a Flask-based ACEest Fitness and Gym application. It has a browser interface, a health endpoint, client management, and fitness-progress recording. It uses SQLite and is packaged to run as a non-root Docker container on port 8000.
 
-The repository includes Pytest tests, coverage reporting, Ruff quality checks, SonarQube configuration, a Jenkins pipeline, a Dockerfile, Docker Compose, Kubernetes manifests, five progressive deployment examples, rollback scripts, the supplied Assignment 1 versions, and this evidence-led report.
+The repository includes Pytest tests, coverage reporting, Ruff checks, SonarQube configuration, a Jenkins pipeline, Docker files, Kubernetes manifests, five deployment examples, rollback scripts, the supplied Assignment 1 versions, and this report.
 
-The supplied archive contained Tkinter desktop applications rather than Flask services. The original files are preserved under legacy/; the deployable Flask application was built separately so the repository meets the assignment&#x27;s explicit Flask requirement without losing the supplied version evidence.
+The supplied archive contained Tkinter desktop applications instead of Flask services. I kept those files under legacy/ and added the Flask service separately so the original work is still available and the assignment&#x27;s Flask requirement is met.
 
 ## Architecture
 
@@ -66,7 +66,7 @@ health smoke test -&gt; evidence capture -&gt; rollback on failure
 | Progressive deployments | deploy/k8s/strategies/ for rolling, blue-green, canary, shadow, and A/B | Manifests and scripts verified; live screenshots require cluster |
 | Rollback | deploy/k8s/scripts/rollback.sh and rollback.ps1, Jenkins failure rollback | Command path verified; live rollback evidence requires cluster |
 | Short report | This report plus evidence/README.md | Included |
-| Hosted CI verification | .github/workflows/ci.yml | Verified remotely: GitHub Actions run 45430507175 succeeded, including Docker image build |
+| Hosted CI verification | .github/workflows/ci.yml | Verified remotely: GitHub Actions run 45432697037 succeeded, including Docker image build |
 
 ## CI/CD implementation
 
@@ -122,15 +122,28 @@ ab-ingress.yaml defines a candidate B workload and NGINX Ingress header routing 
 
 - Local application: http://127.0.0.1:8000/ - available when started with the README command.
 - Local health check: http://127.0.0.1:8000/health.
-- GitHub account: https://github.com/AbhinandanSinhaBitsPilaniWILP - verified through GitHub CLI authentication.
-- GitHub repository: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment - public repository with the verified main branch.
-- GitHub Actions verification: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment/actions/runs/45430507175 - successful tests, quality checks, artifacts, and Docker image build.
+- GitHub account: https://github.com/AbhinandanSinhaBitsPilaniWILP
+- GitHub repository: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment
+- GitHub Actions workflow: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment/blob/main/.github/workflows/ci.yml
+- GitHub Actions run: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment/actions/runs/45432697037 - successful verify and container jobs.
+- Final commit: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment/commit/26dde90
+- Build-status badge: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment/actions/workflows/ci.yml/badge.svg
 - Docker Hub repository: to be filled after the authenticated Docker Hub username and repository are created.
 - Jenkins build URL: to be filled after the Jenkins job is created.
 - SonarQube project URL: to be filled after the project is created on the configured SonarQube server.
 - Kubernetes endpoint: to be filled after Minikube or a cloud cluster is provisioned.
 
-## Screenshots
+## GitHub screenshots and proof
+
+The three GitHub pages below are the useful screenshots for this assignment:
+
+1. Profile page – shows the GitHub account: https://github.com/AbhinandanSinhaBitsPilaniWILP
+2. Repository page – shows the public repository, README, files, and main branch: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment
+3. Actions run – shows the successful `verify` and `container` jobs: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment/actions/runs/45432697037
+
+These links are live GitHub evidence. I have not inserted a made-up image or labelled a local screen as Jenkins, SonarQube, Docker Hub, or Kubernetes evidence.
+
+## Other screenshots
 
 Screenshots must be stored in evidence/screenshots/ using the names in evidence/README.md. The evidence guide deliberately separates locally capturable screens from external-service proof so that generated images are not misrepresented as Jenkins, SonarQube, Docker Hub, or Kubernetes evidence.
 
@@ -153,7 +166,7 @@ Current capture result: the local server started successfully, but browser acces
 ## Challenges and mitigation
 
 1. Framework mismatch: the supplied code was Tkinter, while the assignment requires Flask. The original code is preserved and the deployable service is implemented in Flask.
-2. External tools are environment-dependent: Docker, kubectl, Jenkins, SonarQube, Docker Hub, and GitHub credentials are not assumed. Configuration is committed, while live claims remain pending until the tool result is captured.
+2. External tools are environment-dependent: Docker, kubectl, Jenkins, SonarQube, and Docker Hub are not available in the build environment. Configuration is committed, while live claims remain pending until the tool result is captured. GitHub Actions was verified separately.
 3. Deployment safety: Jenkins deployment is opt-in, image tags are explicit, health probes are required, and rollback commands are included in both shell and PowerShell forms.
 4. Version traceability: all ten supplied files are kept under legacy/, while the deployable application has a clear package boundary and test suite.
 
