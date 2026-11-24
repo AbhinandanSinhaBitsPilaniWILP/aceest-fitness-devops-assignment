@@ -66,7 +66,7 @@ health smoke test -> evidence capture -> rollback on failure
 | Progressive deployments | deploy/k8s/strategies/ for rolling, blue-green, canary, shadow, and A/B | Manifests and scripts verified; live screenshots require cluster |
 | Rollback | deploy/k8s/scripts/rollback.sh and rollback.ps1, Jenkins failure rollback | Command path verified; live rollback evidence requires cluster |
 | Short report | This report plus evidence/README.md | Included |
-| Hosted CI verification | .github/workflows/ci.yml | Verified remotely: GitHub Actions run 45430323848 succeeded, including Docker image build |
+| Hosted CI verification | .github/workflows/ci.yml | Verified remotely: GitHub Actions run 45430507175 succeeded, including Docker image build |
 
 ## CI/CD implementation
 
@@ -124,7 +124,7 @@ ab-ingress.yaml defines a candidate B workload and NGINX Ingress header routing 
 - Local health check: http://127.0.0.1:8000/health.
 - GitHub account: https://github.com/AbhinandanSinhaBitsPilaniWILP - verified through GitHub CLI authentication.
 - GitHub repository: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment - public repository with the verified main branch.
-- GitHub Actions verification: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment/actions/runs/45430323848 - successful tests, quality checks, artifacts, and Docker image build.
+- GitHub Actions verification: https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment/actions/runs/45430507175 - successful tests, quality checks, artifacts, and Docker image build.
 - Docker Hub repository: to be filled after the authenticated Docker Hub username and repository are created.
 - Jenkins build URL: to be filled after the Jenkins job is created.
 - SonarQube project URL: to be filled after the project is created on the configured SonarQube server.
