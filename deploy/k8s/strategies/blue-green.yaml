@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aceest-fitness-blue
+  namespace: aceest
+  labels:
+    app: aceest-fitness
+    track: blue
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aceest-fitness
+      track: blue
+  template:
+    metadata:
+      labels:
+        app: aceest-fitness
+        track: blue
+    spec:
+      containers:
+        - name: aceest-fitness
+          image: aceest-fitness:stable
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aceest-fitness-green
+  namespace: aceest
+  labels:
+    app: aceest-fitness
+    track: green
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aceest-fitness
+      track: green
+  template:
+    metadata:
+      labels:
+        app: aceest-fitness
+        track: green
+    spec:
+      containers:
+        - name: aceest-fitness
+          image: aceest-fitness:candidate
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aceest-fitness-active
+  namespace: aceest
+spec:
+  selector:
+    app: aceest-fitness
+    track: blue
+  ports:
+    - port: 80
+      targetPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aceest-fitness-preview
+  namespace: aceest
+spec:
+  selector:
+    app: aceest-fitness
+    track: green
+  ports:
+    - port: 80
+      targetPort: 8000
+
