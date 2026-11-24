@@ -10,7 +10,13 @@ function showClients(clients) {
   }
   clients.forEach((client) => {
     const item = document.createElement("li");
-    item.innerHTML = `<strong>${client.name}</strong><span>${client.email}</span><small>${client.goal || "Goal not set"}</small>`;
+    const name = document.createElement("strong");
+    const email = document.createElement("span");
+    const goal = document.createElement("small");
+    name.textContent = client.name;
+    email.textContent = client.email;
+    goal.textContent = client.goal || "Goal not set";
+    item.append(name, email, goal);
     list.append(item);
   });
 }

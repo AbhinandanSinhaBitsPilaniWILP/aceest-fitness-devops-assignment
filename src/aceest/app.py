@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import sqlite3
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -49,7 +50,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         static_folder=str(project_root / "static"),
     )
     app.config.from_mapping(
-        DATABASE=str(Path(app.instance_path) / "aceest.db"),
+        DATABASE=os.environ.get("DATABASE", str(Path(app.instance_path) / "aceest.db")),
         JSON_SORT_KEYS=True,
     )
     if test_config:
@@ -82,7 +83,11 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
 
     @app.post("/api/clients")
     def create_client():
-        payload = request.get_json(silent=True) or {}
+        payload = request.get_json(silent=True)
+        if payload is None:
+            payload = {}
+        if not isinstance(payload, dict):
+            return jsonify(error="JSON body must be an object"), 400
         name = str(payload.get("name", "")).strip()
         email = str(payload.get("email", "")).strip().lower()
         goal = str(payload.get("goal", "")).strip()
@@ -123,6 +128,55 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         ).fetchall()
         return jsonify(client=dict(client_row), progress=[dict(row) for row in progress_rows])
 
+    @app.put("/api/clients/<int:client_id>")
+    def update_client(client_id: int):
+        database = get_db()
+        current = database.execute(
+            "SELECT id, name, email, goal, created_at FROM clients WHERE id = ?",
+            (client_id,),
+        ).fetchone()
+        if current is None:
+            return jsonify(error="client not found"), 404
+
+        payload = request.get_json(silent=True)
+        if payload is None:
+            payload = {}
+        if not isinstance(payload, dict):
+            return jsonify(error="JSON body must be an object"), 400
+        name = str(payload.get("name", current["name"])).strip()
+        email = str(payload.get("email", current["email"])).strip().lower()
+        goal = str(payload.get("goal", current["goal"])).strip()
+        if not name or not email:
+            return jsonify(error="name and email are required"), 400
+        if not EMAIL_PATTERN.match(email):
+            return jsonify(error="email must be valid"), 400
+
+        try:
+            database.execute(
+                "UPDATE clients SET name = ?, email = ?, goal = ? WHERE id = ?",
+                (name, email, goal, client_id),
+            )
+            database.commit()
+        except sqlite3.IntegrityError:
+            return jsonify(error="email already exists"), 409
+        updated = database.execute(
+            "SELECT id, name, email, goal, created_at FROM clients WHERE id = ?",
+            (client_id,),
+        ).fetchone()
+        return jsonify(client=dict(updated))
+
+    @app.delete("/api/clients/<int:client_id>")
+    def delete_client(client_id: int):
+        database = get_db()
+        current = database.execute(
+            "SELECT 1 FROM clients WHERE id = ?", (client_id,)
+        ).fetchone()
+        if current is None:
+            return jsonify(error="client not found"), 404
+        database.execute("DELETE FROM clients WHERE id = ?", (client_id,))
+        database.commit()
+        return "", 204
+
     @app.post("/api/clients/<int:client_id>/progress")
     def record_progress(client_id: int):
         database = get_db()
@@ -132,7 +186,11 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         if client_exists is None:
             return jsonify(error="client not found"), 404
 
-        payload = request.get_json(silent=True) or {}
+        payload = request.get_json(silent=True)
+        if payload is None:
+            payload = {}
+        if not isinstance(payload, dict):
+            return jsonify(error="JSON body must be an object"), 400
         try:
             weight_kg = float(payload["weight_kg"])
             workout_minutes = int(payload["workout_minutes"])

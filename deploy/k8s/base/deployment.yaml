@@ -7,7 +7,7 @@ metadata:
     app: aceest-fitness
     release: stable
 spec:
-  replicas: 2
+  replicas: 1
   revisionHistoryLimit: 5
   strategy:
     type: RollingUpdate
@@ -69,5 +69,6 @@ spec:
               memory: 256Mi
       volumes:
         - name: instance-data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: aceest-data
 

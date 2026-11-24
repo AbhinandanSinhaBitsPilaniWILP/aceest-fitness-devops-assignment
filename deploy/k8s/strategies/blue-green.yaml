@@ -18,6 +18,10 @@ spec:
         app: aceest-fitness
         track: blue
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
       containers:
         - name: aceest-fitness
           image: aceest-fitness:stable
@@ -27,6 +31,17 @@ spec:
             httpGet:
               path: /health
               port: 8000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 256Mi}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -48,6 +63,10 @@ spec:
         app: aceest-fitness
         track: green
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
       containers:
         - name: aceest-fitness
           image: aceest-fitness:candidate
@@ -57,6 +76,17 @@ spec:
             httpGet:
               path: /health
               port: 8000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 256Mi}
 ---
 apiVersion: v1
 kind: Service

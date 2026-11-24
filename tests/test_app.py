@@ -68,6 +68,27 @@ def test_client_validation_returns_a_client_error(client, payload, message):
     assert response.json == {"error": message}
 
 
+def test_duplicate_client_email_is_rejected(client):
+    payload = {"name": "First", "email": "duplicate@example.com"}
+    assert client.post("/api/clients", json=payload).status_code == 201
+
+    response = client.post(
+        "/api/clients",
+        json={"name": "Second", "email": "duplicate@example.com"},
+    )
+
+    assert response.status_code == 409
+    assert response.json == {"error": "email already exists"}
+
+
+@pytest.mark.parametrize("payload", [[], "not-an-object", 42])
+def test_non_object_client_json_returns_a_client_error(client, payload):
+    response = client.post("/api/clients", json=payload)
+
+    assert response.status_code == 400
+    assert response.json == {"error": "JSON body must be an object"}
+
+
 def test_progress_can_be_recorded_and_read_back(client):
     created = client.post(
         "/api/clients",
@@ -100,6 +121,84 @@ def test_progress_validation_and_unknown_client_are_safe(client):
 
     assert missing.status_code == 404
     assert invalid.status_code == 404
+
+
+def test_non_object_progress_json_returns_a_client_error(client):
+    created = client.post(
+        "/api/clients",
+        json={"name": "Progress User", "email": "progress@example.com"},
+    )
+    client_id = created.json["client"]["id"]
+
+    response = client.post(f"/api/clients/{client_id}/progress", json=["invalid"])
+
+    assert response.status_code == 400
+    assert response.json == {"error": "JSON body must be an object"}
+
+
+def test_missing_progress_json_returns_a_client_error(client):
+    created = client.post(
+        "/api/clients",
+        json={"name": "Missing Progress", "email": "missing-progress@example.com"},
+    )
+    client_id = created.json["client"]["id"]
+
+    response = client.post(f"/api/clients/{client_id}/progress")
+
+    assert response.status_code == 400
+    assert response.json == {"error": "weight_kg and workout_minutes are required"}
+
+
+def test_client_can_be_updated_and_deleted(client):
+    created = client.post(
+        "/api/clients",
+        json={"name": "Before", "email": "before@example.com", "goal": "Mobility"},
+    )
+    client_id = created.json["client"]["id"]
+
+    updated = client.put(
+        f"/api/clients/{client_id}",
+        json={"name": "After", "email": "after@example.com", "goal": "Strength"},
+    )
+    deleted = client.delete(f"/api/clients/{client_id}")
+    missing = client.get(f"/api/clients/{client_id}")
+
+    assert updated.status_code == 200
+    assert updated.json["client"]["name"] == "After"
+    assert deleted.status_code == 204
+    assert missing.status_code == 404
+
+
+def test_client_update_validates_unknown_invalid_and_duplicate_values(client):
+    first = client.post(
+        "/api/clients", json={"name": "First", "email": "first@example.com"}
+    ).json["client"]["id"]
+    second = client.post(
+        "/api/clients", json={"name": "Second", "email": "second@example.com"}
+    ).json["client"]["id"]
+
+    assert client.put("/api/clients/999", json={}).status_code == 404
+    assert client.put(f"/api/clients/{first}", json=[]).status_code == 400
+    assert client.put(f"/api/clients/{first}", json={"email": "bad"}).status_code == 400
+    assert client.put(f"/api/clients/{first}", json={"email": ""}).status_code == 400
+    duplicate = client.put(
+        f"/api/clients/{first}", json={"email": "second@example.com"}
+    )
+    assert duplicate.status_code == 409
+    assert client.get(f"/api/clients/{second}").status_code == 200
+
+
+def test_deleting_unknown_client_returns_not_found(client):
+    assert client.delete("/api/clients/999").status_code == 404
+
+
+def test_database_path_can_be_configured_from_environment(monkeypatch, tmp_path):
+    database = tmp_path / "environment.db"
+    monkeypatch.setenv("DATABASE", str(database))
+
+    create_app({"TESTING": True})
+
+    assert database.exists()
 
 
 def test_application_factories_can_use_isolated_databases(tmp_path):

@@ -9,10 +9,13 @@ python -m venv .venv
 \.venv\Scripts\Activate.ps1
 python -m pip install -r requirements-dev.txt
 python -m pytest
+$env:PYTHONPATH = "$PWD\src"
 python -m flask --app "aceest:create_app()" run --debug --port 8000
 ```
 
 Open <http://127.0.0.1:8000>. The health endpoint is <http://127.0.0.1:8000/health>.
+
+On a POSIX shell, use `export PYTHONPATH=src` before the Flask command.
 
 ## Repository layout
 

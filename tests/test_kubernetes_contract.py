@@ -12,6 +12,7 @@ def test_base_manifests_define_namespace_service_and_safe_deployment():
     namespace = (BASE / "namespace.yaml").read_text(encoding="utf-8")
     service = (BASE / "service.yaml").read_text(encoding="utf-8")
     deployment = (BASE / "deployment.yaml").read_text(encoding="utf-8")
+    pvc = (BASE / "pvc.yaml").read_text(encoding="utf-8")
 
     assert "kind: Namespace" in namespace
     assert "name: aceest" in namespace
@@ -24,6 +25,8 @@ def test_base_manifests_define_namespace_service_and_safe_deployment():
     assert "livenessProbe:" in deployment
     assert "runAsNonRoot: true" in deployment
     assert "containerPort: 8000" in deployment
+    assert "persistentVolumeClaim:" in deployment
+    assert "kind: PersistentVolumeClaim" in pvc
 
 
 def test_all_required_progressive_strategy_manifests_exist():
@@ -50,6 +53,8 @@ def test_deployment_scripts_are_parameterized_and_can_rollback():
     assert 'kubectl' in deploy
     assert 'IMAGE="${2:-' in deploy
     assert 'kubectl rollout undo' in rollback
+    assert 'STRATEGY="${1:-rolling}"' in rollback
+    assert 'health' in (SCRIPTS / "smoke-test.sh").read_text(encoding="utf-8")
     assert 'param(' in powershell
     assert 'kubectl' in powershell
 
@@ -61,6 +66,18 @@ def test_smoke_and_rollback_scripts_have_failure_safe_shell_options():
     assert "set -euo pipefail" in smoke
     assert "set -euo pipefail" in rollback
     assert "--namespace aceest" in smoke
+
+
+def test_progressive_routes_have_explicit_stable_and_primary_paths():
+    shadow = (STRATEGIES / "shadow-istio.yaml").read_text(encoding="utf-8")
+    ab = (STRATEGIES / "ab-ingress.yaml").read_text(encoding="utf-8")
+    deploy = (SCRIPTS / "deploy.sh").read_text(encoding="utf-8")
+
+    assert "kind: DestinationRule" in shadow
+    assert "name: aceest-fitness-primary" in ab
+    assert 'rolling)' in deploy
+    assert 'blue-green)' in deploy
+    assert 'kubectl apply -f "$K8S_ROOT/base/service.yaml"' not in deploy
 
 
 def test_all_kubernetes_yaml_is_parseable():

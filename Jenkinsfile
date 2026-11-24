@@ -17,6 +17,7 @@ pipeline {
     environment {
         IMAGE_NAME = "${env.DOCKERHUB_NAMESPACE ?: 'your-dockerhub-user'}/aceest-fitness"
         IMAGE_TAG = "${params.IMAGE_TAG ?: "build-${env.BUILD_NUMBER}"}"
+        SONAR_SCANNER_HOME = tool 'sonar-scanner'
     }
 
     stages {
@@ -35,7 +36,7 @@ pipeline {
 
         stage('Unit tests') {
             steps {
-                sh '.venv/bin/python -m pytest --cov=src/aceest --cov-report=xml --cov-report=term-missing'
+                sh '.venv/bin/python -m pytest --junitxml=test-results.xml --cov=src/aceest --cov-report=xml --cov-report=term-missing'
             }
             post {
                 always {
@@ -49,7 +50,7 @@ pipeline {
             steps {
                 sh '.venv/bin/ruff check src tests scripts'
                 withSonarQubeEnv('sonarqube') {
-                    sh 'sonar-scanner'
+                    sh '"$SONAR_SCANNER_HOME/bin/sonar-scanner"'
                 }
             }
         }
@@ -86,6 +87,7 @@ pipeline {
                 expression { return params.DEPLOY }
             }
             steps {
+                sh 'if [ "$PUSH_IMAGE" != "true" ]; then echo "DEPLOY requires PUSH_IMAGE=true so the selected image is available to the cluster" >&2; exit 2; fi'
                 sh 'bash deploy/k8s/scripts/deploy.sh "$DEPLOYMENT_STRATEGY" "$IMAGE_NAME:$IMAGE_TAG"'
             }
         }
@@ -95,7 +97,7 @@ pipeline {
                 expression { return params.DEPLOY }
             }
             steps {
-                sh 'bash deploy/k8s/scripts/smoke-test.sh'
+                sh 'bash deploy/k8s/scripts/smoke-test.sh "$DEPLOYMENT_STRATEGY"'
             }
         }
     }
@@ -105,7 +107,7 @@ pipeline {
             script {
                 // rollback the last deployment when a post-deploy pipeline fails
                 if (params.DEPLOY) {
-                    sh 'kubectl rollout undo deployment/aceest-fitness --namespace aceest --ignore-not-found=true || true'
+                    sh 'bash deploy/k8s/scripts/rollback.sh "$DEPLOYMENT_STRATEGY" || true'
                 }
             }
         }

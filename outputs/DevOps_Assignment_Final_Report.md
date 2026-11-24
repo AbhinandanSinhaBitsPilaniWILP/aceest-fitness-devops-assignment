@@ -47,6 +47,8 @@ health smoke test -> evidence capture -> rollback on failure
 | GET /api/clients | List clients |
 | POST /api/clients | Create a client with name, email, and goal |
 | GET /api/clients/<id> | Read a client and progress history |
+| PUT /api/clients/<id> | Update client details |
+| DELETE /api/clients/<id> | Delete a client and its progress |
 | POST /api/clients/<id>/progress | Record weight and workout progress |
 
 ## Requirements traceability
@@ -55,7 +57,7 @@ health smoke test -> evidence capture -> rollback on failure
 |---|---|---|
 | Flask application | src/aceest, templates, static assets | Verified locally |
 | Git and GitHub | Local Git repository, commit history, README publishing instructions | Local Git verified; GitHub push requires authenticated session |
-| Pytest | tests/, pytest.ini, pytest-cov | Verified locally: 18 tests passed |
+| Pytest | tests/, pytest.ini, pytest-cov | Verified locally: 28 tests passed |
 | Jenkins | Jenkinsfile with checkout, install, tests, quality, image, push, deploy, smoke stages | Pipeline source verified; Jenkins run requires configured server |
 | SonarQube | sonar-project.properties, Jenkins quality-gate stage | Configuration verified; live gate requires SonarQube server |
 | Docker / Podman | Dockerfile, .dockerignore, docker-compose.yml | Docker build requires Docker/Podman; not installed in the build environment |
@@ -83,8 +85,8 @@ The Jenkins post-failure block attempts kubectl rollout undo after a failed depl
 Local verification performed during repository construction:
 
 ~~~text
-Pytest: 18 passed
-Coverage: 94% total for src/aceest
+Pytest: 28 passed
+Coverage: 98% total for src/aceest
 Ruff: All checks passed
 Kubernetes YAML: all base and strategy YAML documents parsed successfully
 Python syntax: application and preserved legacy files compile successfully
