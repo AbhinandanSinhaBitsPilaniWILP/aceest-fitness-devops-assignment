@@ -1,5 +1,7 @@
 # ACEest Fitness DevOps Assignment
 
+[![CI](https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment/actions/workflows/ci.yml/badge.svg)](https://github.com/AbhinandanSinhaBitsPilaniWILP/aceest-fitness-devops-assignment/actions/workflows/ci.yml)
+
 ACEest Fitness is a small Flask web application used to demonstrate Assignment 2's end-to-end CI/CD pipeline. It provides a browser page, a health check, client management, and fitness-progress recording backed by SQLite.
 
 ## Run locally
